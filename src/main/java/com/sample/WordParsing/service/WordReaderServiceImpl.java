@@ -1,53 +1,30 @@
 package com.sample.WordParsing.service;
 
-import java.awt.image.BufferedImage;
-import java.util.Iterator;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
 
-import javax.imageio.ImageIO;
-//import javax.swing.text.html.HTMLDocument.Iterator;
-
-import java.util.List;
-
-import org.apache.poi.openxml4j.exceptions.OpenXML4JException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.openxml4j.opc.PackagePart;
-import org.apache.poi.ss.usermodel.Picture;
-import org.apache.poi.wp.usermodel.CharacterRun;
-import org.apache.poi.wp.usermodel.Paragraph;
-import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.IBodyElement;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFPicture;
 import org.apache.poi.xwpf.usermodel.XWPFPictureData;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
-import org.apache.poi.xwpf.usermodel.XWPFTable;
-import org.apache.poi.xwpf.usermodel.XWPFTableCell;
-import org.apache.poi.xwpf.usermodel.XWPFTableRow;
-import org.apache.xmlbeans.impl.xb.xsdschema.ChoiceDocument;
-//import org.jcp.xml.dsig.internal.dom.Utils;
-//import org.apache.xmlbeans.impl.xb.xsdschema.ListDocument.List;
 import org.springframework.stereotype.Service;
-
+import com.sample.WordParsing.entity.Questions;
+import com.sample.WordParsing.entity.QuestionChoice;
+import com.sample.WordParsing.entity.QuestionGroup;
 
 @Service
 public class WordReaderServiceImpl implements WordReaderService
 {
-	@Override
-     public String getDocument(String doc) throws IOException
+	
+     public List<QuestionGroup> getDocument()throws IOException
      {
-        String fileName = "/Users/binnyjayakumaremily/bulkquestions.docx.doc";
+       
+		String fileName = "/Users/binnyjayakumaremily/bulkquestions.docx.doc";
 
      
         XWPFDocument docm = new XWPFDocument(Files.newInputStream(Paths.get(fileName)));
@@ -55,7 +32,15 @@ public class WordReaderServiceImpl implements WordReaderService
         
         List<XWPFParagraph> paragraphs = docm.getParagraphs();
         List<XWPFPictureData> piclist = docm.getAllPictures();
-        for(XWPFParagraph para : paragraphs) {   
+        
+        for(XWPFParagraph para : paragraphs) {  
+        	// Pattern p = Pattern.compile("D"+"\\."+"[51-100]"+"\\-"+"[51-100]"+"\\)");
+       		// Matcher matcher = p.matcher(para);
+       		// while(matcher.find())
+       		// {
+       			// System.out.println(matcher.group());
+       		// }
+             
         	System.out.println(para.getText());     
         	for(XWPFRun run : para.getRuns()) {
                 System.out.println(run.getEmbeddedPictures().size());
@@ -66,31 +51,69 @@ public class WordReaderServiceImpl implements WordReaderService
         }
         
         }
-
- /*       for (IBodyElement bodyElement : bodyElements) {
-           
-         if(bodyElement instanceof XWPFPicture) { 
-                System.out.println("Picture");
-                
-            }
-            if(bodyElement instanceof XWPFParagraph)
-            {
-                XWPFParagraph para = (XWPFParagraph)bodyElement;
-               
-                System.out.println(para.getText());
-           
-                }
-                
-         } **/
-                
+		
+        
+ 
               
         docm.close(); 
-        return doc;
-            }
-         
+			
+	return getQuestiongroup();
+			
+	}
 	
+	
+	public List<QuestionGroup> getQuestiongroup()
+	{
+		List<QuestionGroup> group = new ArrayList<QuestionGroup>();
+		QuestionGroup qg1 = new QuestionGroup(getQuestions(), "graph", "graph1");
+		QuestionGroup qg2 = new QuestionGroup(getQuestions(), "graph", "graph1");
+		QuestionGroup qg3 = new QuestionGroup(getQuestions(), "graph", "graph1");
+		group.add(qg1);
+		group.add(qg2);
+		group.add(qg3);
+		return group;
+	}
+	
+	public List<Questions> getQuestions()
+	{
+		 List<Questions> testquestion = new ArrayList<Questions>();
+		 Questions q1 = new Questions("Question1", "QuesImage", getChoice());
+		 Questions q2 = new Questions("Question1", "QuesImage", getChoice());
+		 Questions q3 = new Questions("Question1", "QuesImage", getChoice());
+		 testquestion.add(q1);
+		 testquestion.add(q2);
+		 testquestion.add(q3);
+	     //testquestion.setQuestion("Question");
+	     //testquestion.setQuestionImage("questionimage");
+	     //testquestion.setChoices(getChoice());
+	     return testquestion;
+	}
+	
+	
+	public List<QuestionChoice> getChoice()
+	{
+		List<QuestionChoice> choice = new ArrayList<QuestionChoice>();
+		QuestionChoice qc1 = new QuestionChoice(1, "choice1", "Choiceval1");
+		QuestionChoice qc2 = new QuestionChoice(1, "choice1", "Choiceval1");
+		QuestionChoice qc3 = new QuestionChoice(1, "choice1", "Choiceval1");
+		choice.add(qc1);
+		choice.add(qc2);
+		choice.add(qc3);
+		
+		return choice;
+         
+     }
+
+
+	@Override
+	public Questions getDocument(String doc) throws IOException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }
+	
+
          
 
 

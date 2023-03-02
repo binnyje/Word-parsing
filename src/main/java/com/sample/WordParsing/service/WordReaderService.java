@@ -3,13 +3,13 @@ package com.sample.WordParsing.service;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
-import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import com.sample.WordParsing.entity.QuestionGroup;
+import com.sample.WordParsing.entity.Questions;
 
 public interface WordReaderService {
 
-	public String getDocument(String  doc) throws IOException;
+	public Questions getDocument(String  doc) throws IOException;
 
-	
+	public List<QuestionGroup> getDocument() throws IOException;
 
 }
