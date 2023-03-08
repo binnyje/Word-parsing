@@ -7,6 +7,10 @@ public class QuestionChoice {
     private String correctvalue;
     
     
+	public QuestionChoice() {
+		super();
+	}
+
 	public QuestionChoice(int choiceNo, String choiceText, String correctvalue) {
 		super();
 		this.choiceNo = choiceNo;

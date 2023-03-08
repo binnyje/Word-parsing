@@ -1,39 +1,51 @@
 package com.sample.WordParsing.entity;
 
-import java.util.List;
+import java.util.*;
+
 
 public class QuestionGroup {
 	
-	private List<Questions> ques;
-	private String content;
-	private String contextImages;
+	private List<Question> questionGroup;
+	
+	private String context;
+	
+	List<String> contextImages=new ArrayList<String>(); 
 	
 	
-	public QuestionGroup(List<Questions> ques, String content, String contextImages) {
+	public QuestionGroup(List<Question> questionGroup, String context) {
 		super();
-		this.ques = ques;
-		this.content = content;
-		this.contextImages = contextImages;
+		this.setQuestionGroup(questionGroup);
+		this.context = context;
+		//this.contextImages = contextImages;
 	}
 	
-	public List<Questions> getQues() {
-		return ques;
+	public QuestionGroup() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
-	public void setQues(List<Questions> ques) {
-		this.ques = ques;
+	public String getContext() {
+		return context;
 	}
-	public String getContent() {
-		return content;
+	public void setContext(String context) {
+		this.context = context;
 	}
-	public void setContent(String content) {
-		this.content = content;
-	}
-	public String getContextImages() {
+	
+	public List<String> getContextImages() {
 		return contextImages;
 	}
-	public void setContextImages(String contextImages) {
+
+	public void setContextImages(List<String> contextImages) {
 		this.contextImages = contextImages;
 	}
+
+	public List<Question> getQuestionGroup() {
+		return questionGroup;
+	}
+
+	public void setQuestionGroup(List<Question> questionGroup) {
+		this.questionGroup = questionGroup;
+	}
+
 	
 	
 	

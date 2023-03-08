@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sample.WordParsing.entity.QuestionGroup;
-import com.sample.WordParsing.entity.Questions;
+import com.sample.WordParsing.entity.Question;
 //import com.sample.WordParsing.service.$missing$;
 import com.sample.WordParsing.service.WordReaderService;
 

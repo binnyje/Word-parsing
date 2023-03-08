@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.List;
 
 import com.sample.WordParsing.entity.QuestionGroup;
-import com.sample.WordParsing.entity.Questions;
+import com.sample.WordParsing.entity.Question;
 
 public interface WordReaderService {
 
-	public Questions getDocument(String  doc) throws IOException;
+	public Question getDocument(String  doc) throws IOException;
 
 	public List<QuestionGroup> getDocument() throws IOException;
 
