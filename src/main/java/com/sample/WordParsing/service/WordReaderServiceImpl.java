@@ -36,11 +36,12 @@ public class WordReaderServiceImpl implements WordReaderService
          List<QuestionGroup> group = new ArrayList<QuestionGroup>(); 
          List<Question> questions = new ArrayList<Question>();
          List<QuestionChoice> choices = new ArrayList<QuestionChoice>();
+         String marker = new String();
   
          
          String questionGroupMarker = "D\\.[0-9]+-[0-9]+\\)";
          String questionMarker ="Q\\.[0-9]+\\)";
-         String choiceMarker = "[A-Za-z0-9]+\\)";
+         String choiceMarker = "^[A-Za-z0-9]+\\)";
          
         QuestionGroup qg = new QuestionGroup();
         Question q = new Question();    
@@ -51,14 +52,12 @@ public class WordReaderServiceImpl implements WordReaderService
         List<IBodyElement> bodyElements = docm.getBodyElements();
         List<XWPFParagraph> paragraphs = docm.getParagraphs();
         List<XWPFPictureData> piclist = docm.getAllPictures();
-        int i = 0;
-        
+       
         
         
         for(XWPFParagraph para : paragraphs) {
         	String text = para.getText();
-        	System.out.println(para.getText()); 
-
+        	
         	if(findPatternMatch(text, questionGroupMarker))     	
         	{
         		if(qg.getContext()!=null)	
@@ -69,17 +68,19 @@ public class WordReaderServiceImpl implements WordReaderService
 
         		}
         		qg = new QuestionGroup();
-        		q = new Question();
+        		marker = "QuestionGroup";
+         		q = new Question();
         		questions = new ArrayList<Question>();
+        		
         		qg.setContext(text);
         		
         		continue;
         	}
         		 
-        		
-        	if(findImages(para).size() > 0)
-        	{
-        		
+        
+        	if(findImages(para).size() > 0)	
+        	{   
+        	   
         		qg.setContextImages(findImages(para));
         		continue;
         	}
@@ -98,20 +99,55 @@ public class WordReaderServiceImpl implements WordReaderService
 	        	    
         		}
     			q.setQuestion(text);
+    			marker = "Question";
     			choices = new ArrayList<QuestionChoice>();
     			continue;
     			 
         	}
+        	
         	if(findPatternMatch(text, choiceMarker))
         	{ 
         		qc = new QuestionChoice();
+        		marker = "Choice";
         		qc.setChoiceText(text);
         		
         		choices.add(qc);
         		continue;
         	}
+        	
+        	if(marker == "QuestionGroup")
+        	{
+
+        		if(qg.getContext()!=null)
+        		{
+        			qg.setContext(qg.getContext()+ " " +text);
+        		}
+        	}
+        	
+        	
+
+        	if(marker == "Question")
+        	{
+        		if(q.getQuestion()!=null)
+        		{
+        			
+        			
+        			q.setQuestion(q.getQuestion() + text);
+        		}
+        	}
+        	if(marker == "Choice")
+        	{
+        		
+        		if(qc.getChoiceText()!=null)
+        		{
+        			
+        		
+        		qc.setChoiceText(qc.getChoiceText() + text);
+        	}
+        	}
        
         	//group.add(qg);
+        	
         	
         }
 
