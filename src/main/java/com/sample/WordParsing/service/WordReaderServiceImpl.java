@@ -2,15 +2,24 @@ package com.sample.WordParsing.service;
 
 
 
+import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import java.util.*;
+
 
 import org.apache.poi.xwpf.usermodel.IBodyElement;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -18,12 +27,17 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFPicture;
 import org.apache.poi.xwpf.usermodel.XWPFPictureData;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+
+import org.openxmlformats.schemas.officeDocument.x2006.math.CTOMath;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Node;
+
 import com.sample.WordParsing.entity.Question;
 
 
 import com.sample.WordParsing.entity.QuestionChoice;
 import com.sample.WordParsing.entity.QuestionGroup;
+
 
 
 @Service
@@ -52,16 +66,35 @@ public class WordReaderServiceImpl implements WordReaderService
         List<IBodyElement> bodyElements = docm.getBodyElements();
         List<XWPFParagraph> paragraphs = docm.getParagraphs();
         List<XWPFPictureData> piclist = docm.getAllPictures();
-       
         
+        
+         //File stylesheet = new File("OMML2MML.XSL");
+         //TransformerFactory tFactory = TransformerFactory.newInstance();
+         //StreamSource stylesource = new StreamSource(stylesheet);
+        
+         
         
         for(XWPFParagraph para : paragraphs) {
         	String text = para.getText();
+        	System.out.println(text);
+        	
+        	
+        	 for (CTOMath ctomath : para.getCTP().getOMathList()) 
+        	 {             
+        		//System.out.println(ctomath.getOMathArray().toString());  
+        		
+        		try {
+        		System.out.println(getMathML(ctomath,tFactory, stylesource));
+        		}
+        		catch (Exception e)
+        		{}
+        	 } 
         	
         	if(findPatternMatch(text, questionGroupMarker))     	
         	{
         		if(qg.getContext()!=null)	
-        		{   q.setChoices(choices);
+        		{   
+        			q.setChoices(choices);
         			questions.add(q);
         			qg.setQuestionGroup(questions);
         			group.add(qg);
@@ -86,6 +119,7 @@ public class WordReaderServiceImpl implements WordReaderService
         	}
         	
         	
+        	
         	if(findPatternMatch(text, questionMarker))
         	{
         		if(q.getQuestion() != null)
@@ -94,7 +128,7 @@ public class WordReaderServiceImpl implements WordReaderService
 	        	    questions.add(q);
 	        	   
 	        	    q = new Question();
-	        	    qc = new QuestionChoice();
+	        	    //qc = new QuestionChoice();
 	        	    
 	        	    
         		}
@@ -144,6 +178,7 @@ public class WordReaderServiceImpl implements WordReaderService
         		
         		qc.setChoiceText(qc.getChoiceText() + text);
         	}
+        		
         	}
        
         	//group.add(qg);
@@ -157,8 +192,38 @@ public class WordReaderServiceImpl implements WordReaderService
 
 			
 	}
-	
+     
+     
+     
+    /* private  String getMathML(CTOMath ctomath ,TransformerFactory  tFactory,StreamSource stylesource ) throws TransformerException, IOException  {
+         
+         Transformer transformer = tFactory.newTransformer(stylesource);
+
+         Node node = ctomath.getDomNode();
+
+         DOMSource source = new DOMSource(node);
+         StringWriter stringwriter = new StringWriter();
+         StreamResult result = new StreamResult(stringwriter);
+         transformer.setOutputProperty("omit-xml-declaration", "yes");
+         transformer.transform(source, result);
+
+         String mathML = stringwriter.toString();
+         stringwriter.close();
+         mathML = mathML.replaceAll("xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\"", "");
+         mathML = mathML.replaceAll("xmlns:mml", "xmlns");
+         mathML = mathML.replaceAll("mml:", "");
+
+         return mathML;
+        }
+
+
    
+	private int getMathML(CTOMath ctomath) {
+		// TODO Auto-generated method stub
+		return 0;
+	} **/
+
+
 	// Methods
      
      public boolean findPatternMatch(String text,String patternRegex)
