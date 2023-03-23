@@ -68,9 +68,9 @@ public class WordReaderServiceImpl implements WordReaderService
         List<XWPFPictureData> piclist = docm.getAllPictures();
         
         
-         //File stylesheet = new File("OMML2MML.XSL");
-         //TransformerFactory tFactory = TransformerFactory.newInstance();
-         //StreamSource stylesource = new StreamSource(stylesheet);
+         File stylesheet = new File("OMML2MML.XSL");
+         TransformerFactory tFactory = TransformerFactory.newInstance();
+         StreamSource stylesource = new StreamSource(stylesheet);
         
          
         
@@ -79,15 +79,10 @@ public class WordReaderServiceImpl implements WordReaderService
         	System.out.println(text);
         	
         	
-        	 for (CTOMath ctomath : para.getCTP().getOMathList()) 
+        	for (CTOMath ctomath : para.getCTP().getOMathList()) 
         	 {             
         		//System.out.println(ctomath.getOMathArray().toString());  
-        		
-        		try {
-        		System.out.println(getMathML(ctomath,tFactory, stylesource));
-        		}
-        		catch (Exception e)
-        		{}
+        		System.out.println(ctomath.toString());
         	 } 
         	
         	if(findPatternMatch(text, questionGroupMarker))     	
@@ -195,7 +190,7 @@ public class WordReaderServiceImpl implements WordReaderService
      
      
      
-    /* private  String getMathML(CTOMath ctomath ,TransformerFactory  tFactory,StreamSource stylesource ) throws TransformerException, IOException  {
+    private  String getMathML(CTOMath ctomath ,TransformerFactory  tFactory,StreamSource stylesource ) throws TransformerException, IOException  {
          
          Transformer transformer = tFactory.newTransformer(stylesource);
 
@@ -213,7 +208,7 @@ public class WordReaderServiceImpl implements WordReaderService
          mathML = mathML.replaceAll("xmlns:mml", "xmlns");
          mathML = mathML.replaceAll("mml:", "");
 
-         return mathML;
+         return mathML.toString();
         }
 
 
@@ -221,7 +216,7 @@ public class WordReaderServiceImpl implements WordReaderService
 	private int getMathML(CTOMath ctomath) {
 		// TODO Auto-generated method stub
 		return 0;
-	} **/
+	} 
 
 
 	// Methods
