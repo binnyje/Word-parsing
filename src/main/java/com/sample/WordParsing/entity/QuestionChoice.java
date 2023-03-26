@@ -1,5 +1,7 @@
 package com.sample.WordParsing.entity;
 
+import java.util.List;
+
 public class QuestionChoice {
 	
 	private int choiceNo;
@@ -28,7 +30,7 @@ public class QuestionChoice {
 		return choiceText;
 	}
 	public void setChoiceText(String choiceText) {
-		this.choiceText = choiceText;
+		this.choiceText = choiceText;;
 	}
 	public String getCorrectvalue() {
 		return correctvalue;

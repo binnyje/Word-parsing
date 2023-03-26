@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +29,14 @@ import org.apache.poi.xwpf.usermodel.XWPFPictureData;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 
 import org.openxmlformats.schemas.officeDocument.x2006.math.CTOMath;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Node;
 
 import com.sample.WordParsing.entity.Question;
@@ -40,12 +47,17 @@ import com.sample.WordParsing.entity.QuestionGroup;
 
 
 
+
+
 @Service
 public class WordReaderServiceImpl implements WordReaderService
 {
+	 @Autowired
+	private Environment env;
 	
-     public List<QuestionGroup> getDocument()throws IOException
-     {
+     public List<QuestionGroup> getDocument(MultipartFile multipartFile)throws IOException
+     { 
+    	 
     	 
          List<QuestionGroup> group = new ArrayList<QuestionGroup>(); 
          List<Question> questions = new ArrayList<Question>();
@@ -61,16 +73,20 @@ public class WordReaderServiceImpl implements WordReaderService
         Question q = new Question();    
         QuestionChoice qc =  new QuestionChoice();
         
-		String fileName = "/Users/binnyjayakumaremily/bulkquestions.docx.doc";
-        XWPFDocument docm = new XWPFDocument(Files.newInputStream(Paths.get(fileName)));
+  
+    
+        
+        String fileNameNew = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        long size = multipartFile.getSize();
+        String filepath = env.getProperty("tempLocation")+fileNameNew;
+        File file = new File(filepath);   
+        multipartFile.transferTo(file);
+
+        
+        XWPFDocument docm = new XWPFDocument(Files.newInputStream(Paths.get(filepath)));
         List<IBodyElement> bodyElements = docm.getBodyElements();
         List<XWPFParagraph> paragraphs = docm.getParagraphs();
         List<XWPFPictureData> piclist = docm.getAllPictures();
-        
-        
-         File stylesheet = new File("OMML2MML.XSL");
-         TransformerFactory tFactory = TransformerFactory.newInstance();
-         StreamSource stylesource = new StreamSource(stylesheet);
         
          
         
@@ -78,13 +94,8 @@ public class WordReaderServiceImpl implements WordReaderService
         	String text = para.getText();
         	System.out.println(text);
         	
-        	
-        	for (CTOMath ctomath : para.getCTP().getOMathList()) 
-        	 {             
-        		//System.out.println(ctomath.getOMathArray().toString());  
-        		System.out.println(ctomath.toString());
-        	 } 
-        	
+
+
         	if(findPatternMatch(text, questionGroupMarker))     	
         	{
         		if(qg.getContext()!=null)	
@@ -123,8 +134,6 @@ public class WordReaderServiceImpl implements WordReaderService
 	        	    questions.add(q);
 	        	   
 	        	    q = new Question();
-	        	    //qc = new QuestionChoice();
-	        	    
 	        	    
         		}
     			q.setQuestion(text);
@@ -140,9 +149,18 @@ public class WordReaderServiceImpl implements WordReaderService
         		marker = "Choice";
         		qc.setChoiceText(text);
         		
+        		System.out.println(para.getCTP().getOMathList().isEmpty());
+        		if (!para.getCTP().getOMathList().isEmpty()) {
+	                for (CTOMath ctomath : para.getCTP().getOMathList()) 
+	             	 {  
+	                	qc.setChoiceText(qc.getChoiceText() + ctomath.toString());         	
+	             	 } 
+        		}
+    	
         		choices.add(qc);
         		continue;
         	}
+        	
         	
         	if(marker == "QuestionGroup")
         	{
@@ -169,15 +187,10 @@ public class WordReaderServiceImpl implements WordReaderService
         		
         		if(qc.getChoiceText()!=null)
         		{
-        			
-        		
-        		qc.setChoiceText(qc.getChoiceText() + text);
+		        		qc.setChoiceText(qc.getChoiceText() + text);
+		        	}
         	}
-        		
-        	}
-       
-        	//group.add(qg);
-        	
+    
         	
         }
 
@@ -187,37 +200,7 @@ public class WordReaderServiceImpl implements WordReaderService
 
 			
 	}
-     
-     
-     
-    private  String getMathML(CTOMath ctomath ,TransformerFactory  tFactory,StreamSource stylesource ) throws TransformerException, IOException  {
-         
-         Transformer transformer = tFactory.newTransformer(stylesource);
-
-         Node node = ctomath.getDomNode();
-
-         DOMSource source = new DOMSource(node);
-         StringWriter stringwriter = new StringWriter();
-         StreamResult result = new StreamResult(stringwriter);
-         transformer.setOutputProperty("omit-xml-declaration", "yes");
-         transformer.transform(source, result);
-
-         String mathML = stringwriter.toString();
-         stringwriter.close();
-         mathML = mathML.replaceAll("xmlns:m=\"http://schemas.openxmlformats.org/officeDocument/2006/math\"", "");
-         mathML = mathML.replaceAll("xmlns:mml", "xmlns");
-         mathML = mathML.replaceAll("mml:", "");
-
-         return mathML.toString();
-        }
-
-
-   
-	private int getMathML(CTOMath ctomath) {
-		// TODO Auto-generated method stub
-		return 0;
-	} 
-
+ 
 
 	// Methods
      
@@ -233,7 +216,6 @@ public class WordReaderServiceImpl implements WordReaderService
 		    }
 		    return matchFound;
      }
-     
      
      public List<String> findImages(XWPFParagraph para)
      {
@@ -260,6 +242,14 @@ public class WordReaderServiceImpl implements WordReaderService
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
+
+//	@Override
+//	public List<QuestionGroup> getDocument(MultipartFile multipartFile) throws IOException {
+		// TODO Auto-generated method stub
+//		return null;
+//	}
 	
 }
 	
