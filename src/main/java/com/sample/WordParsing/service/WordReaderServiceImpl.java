@@ -94,6 +94,12 @@ public class WordReaderServiceImpl implements WordReaderService
         	String text = para.getText();
         	System.out.println(text);
         	
+        	
+        	 for (CTOMath ctomath : para.getCTP().getOMathList()) 
+         	 {  
+            	System.out.println(ctomath.toString());         	
+         	 } 
+        	
 
 
         	if(findPatternMatch(text, questionGroupMarker))     	
@@ -149,7 +155,7 @@ public class WordReaderServiceImpl implements WordReaderService
         		marker = "Choice";
         		qc.setChoiceText(text);
         		
-        		System.out.println(para.getCTP().getOMathList().isEmpty());
+        		//System.out.println(para.getCTP().getOMathList().isEmpty());
         		if (!para.getCTP().getOMathList().isEmpty()) {
 	                for (CTOMath ctomath : para.getCTP().getOMathList()) 
 	             	 {  
@@ -234,8 +240,6 @@ public class WordReaderServiceImpl implements WordReaderService
     	  } 
     	 return encodedString;
      }
-
-
 
 	@Override
 	public Question getDocument(String doc) throws IOException {
